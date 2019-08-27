@@ -5,16 +5,24 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.kh.ajax.model.vo.Sample;
 import com.kh.ajax.model.vo.User;
@@ -122,8 +130,68 @@ public class TestController {
 		out.close();
 		
 	}
+//==============================================================================================================================		
+	//5. ModelAndView 이용하기
+	@RequestMapping("test5")
+	public ModelAndView test5Method(ModelAndView mv, HttpServletResponse response) {
+		Map<String, Sample> map = new HashMap<String, Sample>();
+		
+		map.put("samp", sam); // sam 은 뭐죠?
+		
+		mv.addAllObjects(map); // 객체 이기때문에??? 
+		// view 단을 json 을 사용해서 보내기 위해서
+		mv.setViewName("jsonView");
+		
+		response.setContentType("application/json; charset=utf-8");
+		
+		return mv;
+		
+	}
+
+//==============================================================================================================================		
+	// 6. @RequestBody 를 이용한 방법
+	@RequestMapping("test6")
+	@ResponseBody
+	public String test6Method(@RequestBody String param) throws ParseException {
+		// json 으로 파싱을 해야 한다.
+		JSONParser parser = new JSONParser();
+		JSONObject jobj = (JSONObject)parser.parse(param);
+		
+		String name = (String)jobj.get("name");
+	//	int age = jobj.get("age"); // 뷰에서는 long 형식으로 온다 - > 먼저 long 으로 받은 다음 전체를 묶어서 int value 로 해준다.
+		int age = ((Long)jobj.get("age")).intValue();
+		
+		System.out.println(name + ", " + age);
+		
+		return "success";
+	}
+//==============================================================================================================================		
+	// 7. 반환 값으로 ResponseEntity<String> 사용
+	// @ResponseBody와 비슷하나 header 값을 변경시킬 수 있고 Http 상대코드도 함꼐 전송 가능
 	
+	/*
+	 	Spring에서는 HttpEntity라는 클래스 제공
+	 		HttpEntity : HTTP프로토콜을 이용하는 통신의 header와 body관련 정보 저장 가능
+	 	HttpEntity를 상속받는 클래스로 RequestEntity와 ResponseEntity 가 있으며  각각 Request, response의 역할을 함
+	 	
+	 	 
+	*/
 	
+	@RequestMapping("test7")
+	public ResponseEntity<String> test7Methode(@RequestBody String param) throws ParseException {
+		JSONParser parser = new JSONParser();
+		JSONArray jArr = (JSONArray)parser.parse(param);
+		
+		for(int i = 0; i < jArr.size(); i++) {
+			JSONObject jobj = (JSONObject)jArr.get(i);
+			
+			String name = (String)jobj.get("name");
+			int age = ((Long)jobj.get("age")).intValue();
+			
+			System.out.println(i + "번째 객체 : " + name + "," + age);
+		}
+		return new ResponseEntity<String>("success",HttpStatus.OK);
+	}
 	
 	
 }

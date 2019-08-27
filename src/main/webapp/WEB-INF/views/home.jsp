@@ -143,6 +143,16 @@
    				$("#test5").on("click",function(){
    					$.ajax({
    						url: "test5",
+   						success: function(data){
+   							$("#d5").html("받을 맵 객체 언어 samp 객체 정보 확인<br>" + 
+   											+ "이름 : " + data.samp.name
+   											+ ", 나이 : " + data.samp.age);
+   							
+   						},
+   						error: function(request, status, errorData){
+								alert("error cod : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + errorData);
+ 						}
+   						
    					});
    				});
    			});
@@ -150,8 +160,64 @@
    		
    		
    	</li>
-   	
-   	
+<!-- ======================================================================================================= -->  	
+ 	<li>
+ 		뷰에서 JSON객체를 컨트롤러로 보내기
+ 		<button id="test6">테스트</button>
+ 		
+ 		<script>
+ 			$(function(){
+ 				$("#test6").on("click", function(){
+ 					
+ 					 var obj = new Object();
+ 					 obj.name = "Cien";
+ 					 obj.age = 22;
+ 					 
+ 					 $.ajax({
+ 						url: "test6",
+ 						data: JSON.stringify(obj),
+ 						type: "post",
+ 						contentType: "application/json; charset=utf-8",
+ 						success: function(data){
+ 							alert("서버로 전송 성공 ! " + data);
+ 						},
+ 						error: function(request, status, errorData){
+							alert("error cod : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + errorData);
+						}
+ 					 });
+ 				});
+ 			});
+ 		</script>
+ 	</li>   	
+ <!-- ======================================================================================================= -->  	
+   	<li>
+   		뷰에서 JSON배열 컨트롤러 보내기
+   		<button id="test7">테스트</button>
+   		
+   		<script>
+   			$(function(){
+   					$("#test7").on("click", function(){
+   						var arr = [{name: "임규범" , age : 26},
+   								   {name: "신재민", age: 25}];
+   						
+   						$.ajax({
+   							url: "test7",
+   							data: JSON.stringify(arr),
+   							type:"POST",
+   							contentType: "application/json; charset=utf-8",
+   							success: function(data){
+   								alert("서버로 전송 성공 !" + data);
+   							},	
+   							error: function(request, status, errorData){
+   								alert("error cod : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + errorData);
+   							}
+   							
+   						});
+   					});
+   			});
+   		</script>
+   		
+   	</li>
    	
    </ol>
    
